@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" class="webui-theme-dark">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Private local-first chat UI for OpenAI-compatible LLM backends.">
+	<title>Retrograde WebUI</title>
+	<link rel="stylesheet" href="css/styles.css">
+	<link rel="stylesheet" href="css/highlight-github-dark.min.css">
+	<link rel="icon" href="img/R.png" type="image/png">
+	<link rel="apple-touch-icon" href="img/R.png" sizes="180x180">
+</head>
+<body>
+	<a class="skip-link" href="#webui-main">Skip to chat</a>
+	<div class="webui-app">
+		<header class="site-header">
+			<div class="nav-inner">
+				<div class="nav-main">
+					<span class="brand webui-brand">
+						<img src="img/R.png" width="36" height="36" alt="Retrograde">
+						<span>Retrograde WebUI</span>
+					</span>
+					<nav aria-label="Primary">
+						<ul class="nav-links">
+							<li><button type="button" class="webui-link-btn" id="webui-help-btn">Help</button></li>
+						</ul>
+					</nav>
+				</div>
+				<p class="hub-link">
+					<button
+						type="button"
+						class="webui-link-btn webui-open-disclaimer webui-privacy-note"
+						aria-label="Open disclaimer: privacy, hosting, and legal notices"
+					>
+						Local-only · no telemetry
+					</button>
+				</p>
+			</div>
+		</header>
+
+		<section
+			class="announcement-banner"
+			id="webui-privacy-banner"
+			data-announcement-id="privacy"
+			data-announcement-version="1"
+			aria-label="Privacy notice"
+		>
+			<div class="announcement-inner">
+				<p>
+					<strong>Private.</strong> Chats and settings stay in this browser unless you export them.
+					<button type="button" class="announcement-dismiss" aria-label="Dismiss notification">×</button>
+				</p>
+			</div>
+		</section>
+
+		<div class="shell webui-shell">
+			<button type="button" class="webui-sidebar-toggle" id="webui-sidebar-toggle" aria-expanded="false" aria-controls="webui-sidebar" title="Toggle sidebar">
+				<span class="webui-sidebar-toggle__icon" aria-hidden="true">☰</span>
+				<span class="webui-sidebar-toggle__label">Menu</span>
+			</button>
+			<div class="webui-backdrop" id="webui-sidebar-backdrop" hidden aria-hidden="true"></div>
+			<div class="webui-layout">
+			<aside class="webui-sidebar" id="webui-sidebar" aria-label="Characters and conversations">
+				<div class="webui-sidebar-section">
+					<div class="webui-sidebar-head">
+						<h2 class="webui-sidebar-title">Characters</h2>
+						<div class="webui-btn-row">
+							<button type="button" class="webui-btn webui-btn--small" id="webui-edit-character-btn" title="Edit character">Edit</button>
+							<button type="button" class="webui-btn webui-btn--small" id="webui-new-character-btn" title="New character">+</button>
+						</div>
+					</div>
+					<div class="webui-list" id="webui-character-list" role="list"></div>
+					<button type="button" class="webui-btn webui-btn--secondary webui-btn--block" id="webui-import-character-btn">Import character (JSON)</button>
+				</div>
+
+				<div class="webui-sidebar-section webui-sidebar-section--grow">
+					<div class="webui-sidebar-head">
+						<h2 class="webui-sidebar-title">Conversations</h2>
+						<button type="button" class="webui-btn webui-btn--small" id="webui-new-conversation-btn" title="New conversation">+</button>
+					</div>
+					<div class="webui-list" id="webui-conversation-list" role="list"></div>
+				</div>
+
+				<div class="webui-sidebar-foot">
+					<button type="button" class="webui-btn webui-btn--secondary webui-btn--block" id="webui-settings-btn">Settings</button>
+				</div>
+			</aside>
+
+			<main id="webui-main" class="webui-main">
+				<div class="webui-chat-header">
+					<div class="webui-chat-header-left">
+						<img class="webui-avatar" id="webui-character-avatar" src="img/default-avatar.svg" width="40" height="40" alt="">
+						<h2 class="webui-chat-title" id="webui-character-name">Select a character</h2>
+					</div>
+					<div class="webui-chat-actions">
+						<button type="button" class="webui-btn webui-btn--small" id="webui-back-msg-btn" title="Remove the last user or assistant message">Back</button>
+						<button type="button" class="webui-btn webui-btn--small" id="webui-regenerate-btn" title="Regenerate">Regenerate</button>
+						<button type="button" class="webui-btn webui-btn--small" id="webui-resend-btn" title="Retry the last request without adding a new user message">Resend</button>
+						<button type="button" class="webui-btn webui-btn--small" id="webui-clear-chat-btn" title="Clear chat">Clear</button>
+					</div>
+				</div>
+
+				<div class="webui-messages" id="webui-messages" aria-live="polite" aria-relevant="additions text"></div>
+
+				<div class="webui-composer-wrap">
+					<div class="webui-composer">
+						<label class="webui-sr-only" for="webui-chat-input">Message</label>
+						<textarea id="webui-chat-input" class="webui-input" rows="3" placeholder="Type a message… (Shift+Enter for newline; empty send = another reply, same chat)"></textarea>
+						<div class="webui-composer__send-col">
+							<button type="button" class="webui-btn" id="webui-stop-btn" hidden title="Stop generating">Stop</button>
+							<button type="button" class="webui-btn" id="webui-send-btn">Send</button>
+						</div>
+					</div>
+				</div>
+			</main>
+			</div>
+		</div>
+
+		<footer class="site-footer">
+			<div class="footer-inner webui-footer-inner">
+				<p class="webui-footer-lead">
+					Runs in your browser. Chats stay in local storage unless you export them.
+					<button type="button" class="webui-link-btn webui-open-disclaimer webui-footer-disclaimer-btn">Disclaimer</button>
+				</p>
+			</div>
+		</footer>
+	</div>
+
+	<!-- Settings panel -->
+	<div class="webui-modal" id="webui-settings-modal" hidden role="dialog" aria-modal="true" aria-labelledby="webui-settings-title">
+		<div class="webui-modal__backdrop" data-close-modal></div>
+		<div class="webui-modal__panel webui-modal__panel--wide">
+			<div class="webui-modal__head">
+				<h2 id="webui-settings-title">Settings</h2>
+				<button type="button" class="webui-modal__close" data-close-modal aria-label="Close">&times;</button>
+			</div>
+			<div class="webui-modal__body webui-settings-body">
+				<div
+					id="webui-settings-loading"
+					class="webui-settings-loading"
+					hidden
+					role="status"
+					aria-live="polite"
+					aria-labelledby="webui-settings-loading-label"
+				>
+					<p id="webui-settings-loading-label" class="webui-settings-loading__label">Fetching models from your API and loading chat adapter templates…</p>
+					<div class="webui-typing" aria-hidden="true">
+						<span class="webui-typing__dots"><span>.</span><span>.</span><span>.</span></span>
+					</div>
+				</div>
+				<div id="webui-settings-content" class="webui-settings-content">
+				<details class="webui-settings-details">
+					<summary class="webui-settings-details__summary">Your persona</summary>
+					<div class="webui-settings-details__panel">
+						<p class="webui-hint">Used in chat display and in requests to the model. Character cards can use <code>{{user}}</code> for your name and <code>{{char}}</code> for the character&rsquo;s name (like SillyTavern).</p>
+						<label class="webui-label" for="webui-persona-name">My name</label>
+						<input type="text" id="webui-persona-name" class="webui-input webui-input--full" autocomplete="name" placeholder="User">
+						<label class="webui-label" for="webui-persona-about">About me</label>
+						<textarea id="webui-persona-about" class="webui-input webui-input--full" rows="3" placeholder="I am a 348 year old wizard who lives on a mountain"></textarea>
+					</div>
+				</details>
+				<details class="webui-settings-details">
+					<summary class="webui-settings-details__summary">API</summary>
+					<div class="webui-settings-details__panel">
+						<label class="webui-label" for="webui-api-url">Endpoint base (OpenAI-compatible)</label>
+						<input type="url" id="webui-api-url" class="webui-input webui-input--full" autocomplete="off" placeholder="http://localhost:5001/v1">
+						<label class="webui-label" for="webui-api-key">API key (optional)</label>
+						<input type="password" id="webui-api-key" class="webui-input webui-input--full" autocomplete="off">
+						<div class="webui-btn-row">
+							<button type="button" class="webui-btn" id="webui-test-connection-btn">Test connection</button>
+						</div>
+					</div>
+				</details>
+				<details class="webui-settings-details">
+					<summary class="webui-settings-details__summary">Model</summary>
+					<div class="webui-settings-details__panel">
+						<label class="webui-label" for="webui-model-select">Model</label>
+						<select id="webui-model-select" class="webui-input webui-input--full"></select>
+						<label class="webui-label" for="webui-chat-adapter">Chat adapter (instruction format)</label>
+						<select id="webui-chat-adapter" class="webui-input webui-input--full"></select>
+						<p class="webui-hint">JSON templates from the <code>adapters</code> folder (KoboldCPP-style). <strong>None</strong> keeps standard OpenAI <code>/v1/chat/completions</code> with <code>messages</code>. When you pick an adapter, the UI builds one <code>prompt</code> string and calls <code>/v1/completions</code> — your backend must support that endpoint. Edit <code>adapters/manifest.json</code> to change the list.</p>
+						<label class="webui-label" for="webui-temperature">Temperature: <span id="webui-temperature-val">0.7</span></label>
+						<input type="range" id="webui-temperature" min="0" max="2" step="0.1" value="0.7">
+						<label class="webui-label" for="webui-max-tokens">Max reply tokens (per completion): <span id="webui-max-tokens-val">2048</span></label>
+						<input type="range" id="webui-max-tokens" min="256" max="8192" step="256" value="2048">
+						<p class="webui-hint">Caps how long each <strong>assistant message</strong> can be. It does <strong>not</strong> limit the whole conversation; use <strong>Context in API requests</strong> below to trim what is sent as input.</p>
+						<label class="webui-label" for="webui-top-p">Top P: <span id="webui-top-p-val">0.9</span></label>
+						<input type="range" id="webui-top-p" min="0" max="1" step="0.05" value="0.9">
+						<label class="webui-label" for="webui-freq-pen">Frequency penalty: <span id="webui-freq-pen-val">0</span></label>
+						<input type="range" id="webui-freq-pen" min="-2" max="2" step="0.1" value="0">
+						<label class="webui-label" for="webui-pres-pen">Presence penalty: <span id="webui-pres-pen-val">0</span></label>
+						<input type="range" id="webui-pres-pen" min="-2" max="2" step="0.1" value="0">
+						<label class="webui-check">
+							<input type="checkbox" id="webui-streaming"> Stream responses (SSE)
+						</label>
+						<label class="webui-label" for="webui-context-mode">Context in API requests</label>
+						<p class="webui-hint">The full chat is sent by default. Trim older turns here to save tokens; empty-send &ldquo;continue&rdquo; adds the line below only to the request (not your saved transcript).</p>
+						<select id="webui-context-mode" class="webui-input webui-input--full">
+							<option value="full">Full conversation (no trimming)</option>
+							<option value="messages">Last N user/assistant messages</option>
+							<option value="tokens">Approximate token budget</option>
+							<option value="backend">From API (when model lists context length)</option>
+						</select>
+						<div id="webui-context-messages-wrap" hidden>
+							<label class="webui-label" for="webui-context-max-messages">Message count (min 2)</label>
+							<input type="number" id="webui-context-max-messages" class="webui-input webui-input--full" min="2" max="999" step="1" value="40">
+						</div>
+						<div id="webui-context-tokens-wrap" hidden>
+							<label class="webui-label" for="webui-context-tokens-budget">Token budget (~4 chars ≈ 1 token)</label>
+							<input type="number" id="webui-context-tokens-budget" class="webui-input webui-input--full" min="512" max="2000000" step="256" value="8192">
+						</div>
+						<p class="webui-hint" id="webui-context-backend-note" hidden>Uses <code>context_length</code> / <code>n_ctx</code> from <code>/v1/models</code> when present. Otherwise the budget above is used. When trimming, room for the next reply is reserved using <strong>max reply tokens</strong> above.</p>
+						<label class="webui-label" for="webui-continue-prompt">Continuation prompt (empty-send when last line is assistant)</label>
+						<input type="text" id="webui-continue-prompt" class="webui-input webui-input--full" autocomplete="off" placeholder="Optional — e.g. Continue. if your backend needs text">
+					</div>
+				</details>
+				<details class="webui-settings-details">
+					<summary class="webui-settings-details__summary">Appearance</summary>
+					<div class="webui-settings-details__panel">
+						<label class="webui-label" for="webui-theme">Theme</label>
+						<select id="webui-theme" class="webui-input webui-input--full">
+							<option value="dark">Dark</option>
+							<option value="light">Psychopathic</option>
+						</select>
+						<label class="webui-label" for="webui-accent">Accent</label>
+						<input type="color" id="webui-accent" value="#d4000b">
+						<label class="webui-label" for="webui-font-size">Font size: <span id="webui-font-size-val">16</span>px</label>
+						<input type="range" id="webui-font-size" min="12" max="24" step="1" value="16">
+						<label class="webui-label" for="webui-display-timezone">Time zone (timestamps)</label>
+						<select id="webui-display-timezone" class="webui-input webui-input--full"></select>
+						<p class="webui-hint">Applies to message times and the conversation list. <strong>Automatic</strong> follows your browser (<code id="webui-display-timezone-detected">—</code>).</p>
+					</div>
+				</details>
+				<details class="webui-settings-details">
+					<summary class="webui-settings-details__summary">Data</summary>
+					<div class="webui-settings-details__panel">
+						<button type="button" class="webui-btn" id="webui-export-btn">Export all data</button>
+						<button type="button" class="webui-btn webui-btn--secondary" id="webui-import-btn">Import data</button>
+						<div class="webui-destructive">
+							<h4>Destructive</h4>
+							<button type="button" class="webui-btn webui-btn--danger" id="webui-forget-btn">Forget everything</button>
+						</div>
+					</div>
+				</details>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Character modal -->
+	<div class="webui-modal" id="webui-character-modal" hidden role="dialog" aria-modal="true" aria-labelledby="webui-character-modal-title">
+		<div class="webui-modal__backdrop" data-close-modal></div>
+		<div class="webui-modal__panel">
+			<div class="webui-modal__head">
+				<h2 id="webui-character-modal-title">Character</h2>
+				<button type="button" class="webui-modal__close" data-close-modal aria-label="Close">&times;</button>
+			</div>
+			<div class="webui-modal__body">
+				<label class="webui-label" for="webui-char-name">Name</label>
+				<input type="text" id="webui-char-name" class="webui-input webui-input--full" required>
+				<label class="webui-label" for="webui-char-avatar">Avatar</label>
+				<div class="webui-avatar-upload">
+					<img id="webui-char-avatar-preview" src="img/default-avatar.svg" width="64" height="64" alt="">
+					<input type="file" id="webui-char-avatar" accept="image/*">
+				</div>
+				<label class="webui-label" for="webui-char-desc">Description</label>
+				<textarea id="webui-char-desc" class="webui-input webui-input--full" rows="3"></textarea>
+				<label class="webui-label" for="webui-char-personality">Personality</label>
+				<textarea id="webui-char-personality" class="webui-input webui-input--full" rows="5"></textarea>
+				<label class="webui-label" for="webui-char-first">First message</label>
+				<textarea id="webui-char-first" class="webui-input webui-input--full" rows="3"></textarea>
+				<label class="webui-label" for="webui-char-examples">Example messages</label>
+				<textarea id="webui-char-examples" class="webui-input webui-input--full" rows="4" placeholder="User: Hello&#10;Assistant: Hi!"></textarea>
+			</div>
+			<div class="webui-modal__foot">
+				<button type="button" class="webui-btn" id="webui-char-save">Save</button>
+				<button type="button" class="webui-btn webui-btn--secondary" data-close-modal>Cancel</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Import JSON modal -->
+	<div class="webui-modal" id="webui-import-modal" hidden role="dialog" aria-modal="true" aria-labelledby="webui-import-title">
+		<div class="webui-modal__backdrop" data-close-modal></div>
+		<div class="webui-modal__panel">
+			<div class="webui-modal__head">
+				<h2 id="webui-import-title">Import character</h2>
+				<button type="button" class="webui-modal__close" data-close-modal aria-label="Close">&times;</button>
+			</div>
+			<div class="webui-modal__body">
+				<label class="webui-label" for="webui-import-json">JSON</label>
+				<textarea id="webui-import-json" class="webui-input webui-input--full" rows="8" placeholder="Paste character JSON"></textarea>
+				<label class="webui-label" for="webui-import-file">Or file</label>
+				<input type="file" id="webui-import-file" accept=".json,application/json">
+				<p class="webui-hint">Supports SillyTavern / Chub / chara_card_v2 and common exports.</p>
+			</div>
+			<div class="webui-modal__foot">
+				<button type="button" class="webui-btn" id="webui-import-confirm">Import</button>
+				<button type="button" class="webui-btn webui-btn--secondary" data-close-modal>Cancel</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Forget modal -->
+	<div class="webui-modal" id="webui-forget-modal" hidden role="dialog" aria-modal="true" aria-labelledby="webui-forget-title">
+		<div class="webui-modal__backdrop" data-close-modal></div>
+		<div class="webui-modal__panel">
+			<div class="webui-modal__head">
+				<h2 id="webui-forget-title">Forget everything</h2>
+				<button type="button" class="webui-modal__close" data-close-modal aria-label="Close">&times;</button>
+			</div>
+			<div class="webui-modal__body">
+				<p class="webui-warning">This deletes all characters, conversations, and settings (including API keys) from this browser.</p>
+				<label class="webui-label" for="webui-forget-confirm">Type <strong>FORGET</strong> to confirm</label>
+				<input type="text" id="webui-forget-confirm" class="webui-input webui-input--full" autocomplete="off">
+			</div>
+			<div class="webui-modal__foot">
+				<button type="button" class="webui-btn webui-btn--danger" id="webui-forget-do" disabled>Forget everything</button>
+				<button type="button" class="webui-btn webui-btn--secondary" data-close-modal>Cancel</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Help modal -->
+	<div class="webui-modal" id="webui-help-modal" hidden role="dialog" aria-modal="true" aria-labelledby="webui-help-title">
+		<div class="webui-modal__backdrop" data-close-modal></div>
+		<div class="webui-modal__panel webui-modal__panel--wide">
+			<div class="webui-modal__head">
+				<h2 id="webui-help-title">Help</h2>
+				<button type="button" class="webui-modal__close" data-close-modal aria-label="Close">&times;</button>
+			</div>
+			<div class="webui-modal__body webui-help-body">
+				<p class="note-panel webui-help-privacy-notice" role="note">
+					<strong>Private.</strong> Chats and settings stay in this browser unless you export them.
+				</p>
+				<h3>Quick start</h3>
+				<ol>
+					<li>Open <strong>Settings</strong> and set your API base URL (e.g. KoboldCPP or <code>http://localhost:5001/v1</code>).</li>
+					<li><strong>Test connection</strong>, pick a model, then create or import a character.</li>
+					<li>Start a conversation and send messages. Enable <strong>Stream responses</strong> if your backend supports SSE.</li>
+				</ol>
+				<h3>Tips</h3>
+				<ul>
+					<li><strong>Empty send</strong> asks for another assistant reply. Your saved chat does not get an extra line; if the last turn is the assistant, an extra <strong>user</strong> turn is sent only in the API request (empty content by default; add text in Settings if your backend needs it).</li>
+					<li><strong>Context</strong> (Settings → Model): choose full history or trim by last <em>N</em> messages, an approximate token budget, or context length from the API when the model entry includes it.</li>
+					<li><strong>Max reply tokens</strong> is only the cap on each <strong>generated</strong> assistant message (the <code>max_tokens</code> sent to the API). It is not the context-window size for the whole chat.</li>
+					<li><strong>Chat adapter</strong> (Settings → Model) selects a template from <code>adapters/</code> so the request uses the right special tokens; it switches the client to the <code>/v1/completions</code> prompt API instead of chat messages.</li>
+					<li><strong>Regenerate</strong> replaces the last assistant reply or resends the last user message.</li>
+					<li><strong>Resend</strong> (chat header) retries with the current transcript—no duplicate user line if the backend failed after you sent.</li>
+					<li><strong>Back</strong> removes the last user or assistant message (system prompt is kept).</li>
+					<li>Chat bubbles support <strong>Markdown</strong> and fenced code blocks (highlighted locally in the browser).</li>
+					<li>In <strong>Settings → Your persona</strong>, set your name and bio; <code>{{user}}</code> and <code>{{char}}</code> in card text and messages are filled from that and the active character.</li>
+					<li>Use <strong>Export / Import</strong> to back up data. <strong>Forget everything</strong> wipes local storage completely.</li>
+				</ul>
+				<p class="webui-help-disclaimer-pointer">
+					Hosting, privacy, and legal notices are in
+					<button type="button" class="webui-link-btn webui-open-disclaimer">Disclaimer</button>.
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<!-- Disclaimer modal -->
+	<div class="webui-modal" id="webui-disclaimer-modal" hidden role="dialog" aria-modal="true" aria-labelledby="webui-disclaimer-title">
+		<div class="webui-modal__backdrop" data-close-modal></div>
+		<div class="webui-modal__panel webui-modal__panel--wide">
+			<div class="webui-modal__head">
+				<h2 id="webui-disclaimer-title">Disclaimer</h2>
+				<button type="button" class="webui-modal__close" data-close-modal aria-label="Close">&times;</button>
+			</div>
+			<div class="webui-modal__body webui-disclaimer-body">
+				<p class="note-panel webui-disclaimer-privacy" role="note">
+					<strong>Private.</strong> Chats and settings stay in this browser unless you export them.
+					Markdown and syntax highlighting in messages are rendered only in your browser from bundled scripts (no third-party formatter or CDN).
+				</p>
+				<div class="webui-disclaimer-legal">
+					<h3>How this site fits in (hosting &amp; responsibility)</h3>
+					<p>
+						The server that <strong>hosts these static files</strong> only sends you the WebUI (HTML, CSS, JavaScript). In normal use, <strong>your prompts and model replies are not sent to that host</strong>; your browser talks <strong>directly</strong> to whatever <strong>API base URL</strong> you configure in Settings (for example your own computer or another service you control).
+					</p>
+					<p>
+						<strong>Your chats and settings</strong> are stored in <strong>your browser</strong> unless you export them. Whoever runs the <strong>LLM / API server</strong> you point at may process and log traffic according to their own setup—you choose that endpoint.
+					</p>
+					<p>
+						<strong>You are responsible</strong> for your use of this tool, for the content you create, for obeying applicable laws and any terms of the APIs or models you use, and for any misuse. This interface is provided <strong>as-is</strong>, without warranty. To the extent allowed by law, the people who publish this hosted WebUI are <strong>not liable</strong> for user-generated content, third-party backends, or how others use the software.
+					</p>
+					<p>
+						<strong>This host only serves the interface.</strong> Your API calls go to the server you set in Settings, not to the operator of this page, unless you deliberately configure otherwise.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="webui-toast-host" class="webui-toast-host" aria-live="polite"></div>
+
+	<script type="module" src="js/main.js"></script>
+</body>
+</html>

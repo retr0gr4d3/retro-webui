@@ -1,0 +1,30 @@
+{
+	"adapters": [
+		{ "file": "Alpaca.json", "label": "Alpaca" },
+		{ "file": "ChatML-NoThink.json", "label": "ChatML (no think)" },
+		{ "file": "ChatML.json", "label": "ChatML" },
+		{ "file": "Command-R.json", "label": "Command R" },
+		{ "file": "DeepSeek.json", "label": "DeepSeek" },
+		{ "file": "Gemma-3.json", "label": "Gemma 3" },
+		{ "file": "Gemma-4-26B-31B.json", "label": "Gemma 4 (26B / 31B)" },
+		{ "file": "Gemma-4-E2B-E4B.json", "label": "Gemma 4 (E2B / E4B)" },
+		{ "file": "GLM-4-NoThink.json", "label": "GLM-4 (no think)" },
+		{ "file": "GLM-4.7-NoThink.json", "label": "GLM-4.7 (no think)" },
+		{ "file": "GLM-4.json", "label": "GLM-4" },
+		{ "file": "Granite-4.json", "label": "Granite 4" },
+		{ "file": "Jamba.json", "label": "Jamba" },
+		{ "file": "Llama-2-Chat.json", "label": "Llama 2 Chat" },
+		{ "file": "Llama-3.json", "label": "Llama 3" },
+		{ "file": "Llama-4.json", "label": "Llama 4" },
+		{ "file": "Metharme.json", "label": "Metharme" },
+		{ "file": "MiniMax.json", "label": "MiniMax" },
+		{ "file": "Mistral-NonTekken.json", "label": "Mistral (non-Tekken)" },
+		{ "file": "Mistral-Tekken.json", "label": "Mistral Tekken" },
+		{ "file": "OpenAI-Harmony.json", "label": "OpenAI Harmony" },
+		{ "file": "Phi-3.json", "label": "Phi 3" },
+		{ "file": "RWKV-World.json", "label": "RWKV World" },
+		{ "file": "Seed-OSS-NoThink.json", "label": "Seed OSS (no think)" },
+		{ "file": "Seed-OSS.json", "label": "Seed OSS" },
+		{ "file": "Vicuna.json", "label": "Vicuna" }
+	]
+}
