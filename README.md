@@ -135,9 +135,3 @@ The app uses namespaced `localStorage` keys (see `js/storage.js`), including cha
 | Adapters missing or stuck loading | `adapters/manifest.json` and JSON files are deployed next to `index.html`; server returns them with correct MIME type; path is same origin as the page. |
 | Module load errors | Serve over `http(s)://`, not `file://`. |
 | Edited markdown not updating | Run `npm run build:markdown` after changing `js/markdown.js`. |
-
----
-
-## License
-
-See the repository root or your distribution for license terms. This README describes the **rewrite** subtree only.
